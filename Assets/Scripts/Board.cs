@@ -64,7 +64,12 @@ public class Board : MonoBehaviour {
 				Vector4 balanceNew;
 				balanceNew = theBalanceBoard-minus;
 				balanceZero = false;		
-				klicaj1.gameObject.SetActive(false);		
+				klicaj1.gameObject.SetActive(false);	
+				
+				gor.gameObject.SetActive(true);
+				desno.gameObject.SetActive(true);
+				dol.gameObject.SetActive(true);
+				levo.gameObject.SetActive(true);
 				// vizualizacija
 				float valueFront = (balanceNew[0] + balanceNew[1]) / 2.0f;
 		        float valueBack = (balanceNew[2] + balanceNew[3]) / 2.0f;   
@@ -133,6 +138,11 @@ public class Board : MonoBehaviour {
             }
         }
     }
+
+	public void ExitGame()
+	{
+		Application.Quit();
+	}
 
 	public void CancelSearch()
 	{

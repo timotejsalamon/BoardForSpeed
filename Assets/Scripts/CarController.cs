@@ -31,7 +31,7 @@ public class CarController : MonoBehaviour
 
     public float maxAcceleration = 20.0f;
 
-    private float speedMax = 300.0f;
+    private float speedMax = 320.0f;
     public float brakeAcceleration = 60.0f;
 
     private float turnSensitivity = 0.4f;
@@ -72,7 +72,6 @@ public class CarController : MonoBehaviour
     private float maxPitch = 1f;
     private float pitchFromCar;
     private AudioSource carAudio;
-    private float boostValue = 0f;
     public AudioClip powerUp;
     public AudioClip powerDown;
 
@@ -88,10 +87,13 @@ public class CarController : MonoBehaviour
         BoardMinus BoardMinusInstance = BoardMinus.Instance;
         minus = BoardMinusInstance.minus;
         stoja = !BoardMinusInstance.sedenje;
+        Debug.Log(stoja);
 
         if (stoja) {
-            vizMul = 0.1f;
+            vizMul = 0.2f;
             jumpTreshold = 5f;
+            turnSensitivity = 0.2f;
+            speedMax = 300f;
         }
         else {
             vizMul = 0.2f;
@@ -208,9 +210,13 @@ public class CarController : MonoBehaviour
         foreach(var wheel in wheels)
         {
             float speed = moveInput * speedMax * maxAcceleration * Time.deltaTime;
-            if (Mathf.Abs(speed) > 400)
+            if (speed > 400)
             {
                 speed = 400;
+            }
+            else if (speed < -400)
+            {
+                speed = -400;
             }
             wheel.wheelCollider.motorTorque = speed;
         }
@@ -224,7 +230,7 @@ public class CarController : MonoBehaviour
             {
                 if (wheel.axel == Axel.Front)
                 {
-                    var _steerAngle = steerInput * turnSensitivity * maxSteerAngle + boostValue;
+                    var _steerAngle = steerInput * turnSensitivity * maxSteerAngle;
                     wheel.wheelCollider.steerAngle = Mathf.Lerp(wheel.wheelCollider.steerAngle, _steerAngle, 0.6f);
                 }
             }
@@ -281,6 +287,15 @@ public class CarController : MonoBehaviour
             StartCoroutine(SpeedSlow());
             other.gameObject.SetActive(false);
         }
+
+        if (other.CompareTag("start"))
+        {   
+            Timer timerController = FindObjectOfType<Timer>();
+            if (timerController != null)
+            {
+                timerController.StartTimer();
+            }
+        }
     }
 
     bool IsWheelTouchingFloor()
@@ -312,7 +327,6 @@ public class CarController : MonoBehaviour
         yield return null;
     }
 }
-
 
     void EngineSound()
     {
