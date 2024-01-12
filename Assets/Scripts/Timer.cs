@@ -7,12 +7,14 @@ using TMPro;
 public class Timer : MonoBehaviour
 {
     private float timer;
+    public float timerSecret;
     private bool isTimerRunning;
     public TMP_Text timerText;
 
     void Start()
     {
         timer = 0f;
+        timerSecret = 0f;
         isTimerRunning = false;
     }
 
@@ -35,6 +37,7 @@ public class Timer : MonoBehaviour
             timerText.text = "";
             isTimerRunning = false;
         }
+        timerSecret += Time.deltaTime;
     }
 
     public void StartTimer()
@@ -53,6 +56,11 @@ public class Timer : MonoBehaviour
     public float GetTimer()
     {
         return timer;
+    }
+
+    public float returnTimer()
+    {
+        return timerSecret;
     }
     
 }

@@ -31,10 +31,10 @@ public class CarController : MonoBehaviour
 
     public float maxAcceleration = 20.0f;
 
-    private float speedMax = 320.0f;
+    private float speedMax = 250.0f;
     public float brakeAcceleration = 60.0f;
 
-    private float turnSensitivity = 0.4f;
+    private float turnSensitivity = 0.35f;
     public float maxSteerAngle = 30.0f;
 
     public Vector3 _centerOfMass;
@@ -74,6 +74,8 @@ public class CarController : MonoBehaviour
     private AudioSource carAudio;
     public AudioClip powerUp;
     public AudioClip powerDown;
+    private Timer timer;
+    private bool timerSlow = false;
 
     void Start()
     {
@@ -93,7 +95,7 @@ public class CarController : MonoBehaviour
             vizMul = 0.2f;
             jumpTreshold = 5f;
             turnSensitivity = 0.2f;
-            speedMax = 300f;
+            speedMax = 280f;
         }
         else {
             vizMul = 0.2f;
@@ -209,14 +211,14 @@ public class CarController : MonoBehaviour
     {
         foreach(var wheel in wheels)
         {
-            float speed = moveInput * speedMax * maxAcceleration * Time.deltaTime;
-            if (speed > 400)
+            float speed = moveInput * speedMax * maxAcceleration * Time.fixedDeltaTime;
+            if (speed > 350)
             {
-                speed = 400;
+                speed = 350;
             }
-            else if (speed < -400)
+            else if (speed < -350)
             {
-                speed = -400;
+                speed = -350;
             }
             wheel.wheelCollider.motorTorque = speed;
         }
@@ -234,6 +236,10 @@ public class CarController : MonoBehaviour
                     wheel.wheelCollider.steerAngle = Mathf.Lerp(wheel.wheelCollider.steerAngle, _steerAngle, 0.6f);
                 }
             }
+            else
+            {
+                steerInput = 0f;
+            }
         }
     }
 
@@ -243,7 +249,7 @@ public class CarController : MonoBehaviour
         {
             foreach (var wheel in wheels)
             {
-                wheel.wheelCollider.brakeTorque = 300 * brakeAcceleration * Time.deltaTime;
+                wheel.wheelCollider.brakeTorque = 300 * brakeAcceleration * Time.fixedDeltaTime;
             }
         }
         else
@@ -284,7 +290,7 @@ public class CarController : MonoBehaviour
         if (other.CompareTag("Slow"))
         {
             AudioSource.PlayClipAtPoint(powerDown, transform.position);
-            StartCoroutine(SpeedSlow());
+            SpeedSlow();
             other.gameObject.SetActive(false);
         }
 
@@ -316,17 +322,11 @@ public class CarController : MonoBehaviour
         carRb.AddForce(transform.TransformDirection(Vector3.forward * 5000f ), ForceMode.Impulse);
     }
 
-    IEnumerator SpeedSlow()
-{
-    float time = 0;
-    while (time < 1f)
+    void SpeedSlow()
     {
         Vector3 brakingDirection = -transform.forward;
-        carRb.AddForce(brakingDirection * 1000f, ForceMode.Force);
-        time += Time.deltaTime;
-        yield return null;
+        carRb.AddForce(brakingDirection * 3000f, ForceMode.Impulse);
     }
-}
 
     void EngineSound()
     {
